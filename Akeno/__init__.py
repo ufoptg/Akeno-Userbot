@@ -21,9 +21,10 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.raw.all import layer
 from pyrogram.types import *
 from pytgcalls import GroupCallFactory
+from telethon import TelegramClient
 
 from Akeno.utils.logger import LOGS
-from config import API_HASH, API_ID, SESSION
+from config import API_HASH, API_ID, SESSION, TELETHON_SESSION
 
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +43,7 @@ SUDOERS = filters.user()
 
 aiohttpsession = ClientSession()
 
+# Pyrogram Client
 client = Client(
     "one",
     app_version="latest",
@@ -56,3 +58,20 @@ if not hasattr(client, "group_call"):
     setattr(client, "group_call", GroupCallFactory(client).get_group_call())
 
 clients.append(client)
+
+# Telethon Client
+telethon_client = TelegramClient(
+    TELETHON_SESSION,  # You need to specify this in your config file
+    API_ID,
+    API_HASH
+)
+clients.append(telethon_client)
+
+# Starting the clients
+async def start_clients():
+    await client.start()
+    await telethon_client.start()
+    logger.info("Both clients have been started successfully.")
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(start_clients())
