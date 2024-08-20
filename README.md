@@ -14,7 +14,7 @@
 
 ### 🚀 Deploy on VPS: (Python3.11+)
 ```console
-@root: git clone https://github.com/TeamKillerX/Akeno-Userbot
+@root: git clone https://github.com/ufoptg/Akeno-Userbot
 @root: cd Akeno-Userbot
 @root: pip3 install -r requirements.txt
 @root: mv .env_sample .env
@@ -46,6 +46,8 @@ docker run -it -p 7860:7860 --platform=linux/amd64 \
  - `API_HASH` - Get it from [my.telegram.org](https://my.telegram.org/)
 
  - `SESSION` - Get it from [`@randydev_bot`](https://t.me/randydev_bot) or [`replit pyrogram`](https://replit.com/@ABHITHEMODDER/MoonUb-Session-Gen)
+
+ - `TELETHON_SESSION` - Get it from [`@randydev_bot`](https://t.me/randydev_bot) or [`replit pyrogram`](https://replit.com/@ABHITHEMODDER/MoonUb-Session-Gen)
 
 
  - `GOOGLE_API_KEY` - Get it from [`google-api-key`](https://ai.google.dev)
