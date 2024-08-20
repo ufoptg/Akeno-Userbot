@@ -85,3 +85,7 @@ nest_asyncio
 cohere
 icrawler
 unidecode
+git-python
+emoji
+pySmartDL
+selenium
