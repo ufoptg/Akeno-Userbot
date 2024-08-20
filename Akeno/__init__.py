@@ -22,6 +22,7 @@ from pyrogram.raw.all import layer
 from pyrogram.types import *
 from pytgcalls import GroupCallFactory
 from telethon import TelegramClient
+from telethon import __version__ as telethon_version
 
 from Akeno.utils.logger import LOGS
 from config import API_HASH, API_ID, SESSION, TELETHON_SESSION
@@ -47,6 +48,7 @@ __version__ = {
 # Pyrogram Client
     "pyrogram": pyrogram_version,
     "python": python_version(),
+    "telethon": telethon_version,
 }
 
 # Pyrogram Client
