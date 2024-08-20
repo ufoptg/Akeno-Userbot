@@ -29,6 +29,7 @@ from pyrogram.errors import *
 from uvloop import install
 
 from Akeno import aiohttpsession, clients
+from Akeno.utils.database import db
 from Akeno.utils.logger import LOGS
 
 logging.basicConfig(level=logging.INFO)
@@ -36,31 +37,43 @@ logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
 logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
 loop = asyncio.get_event_loop()
 
-search_telegem = b"\xff\xfeR\x00e\x00n\x00d\x00y\x00P\x00r\x00o\x00j\x00e\x00c\x00t\x00s\x00"
-
 async def main():
     try:
+        await db.connect()
         for cli in clients:
             try:
                 await cli.start()
-                ex = await cli.get_me()
-                LOGS.info(f"Started {ex.first_name}")
-                await cli.send_message("me", "Starting Userbot")
-                await cli.join_chat(search_telegem.decode('utf-16'))
-            except UserIsBlocked:
-                LOGS.error("You have been blocked. Please support @xtdevs")
-                return
+            except SessionExpired as e:
+                LOGS.info(f"Error {e}")
+                sys.exit(1)
+            except ApiIdInvalid as e:
+                LOGS.info(f"Error {e}")
+                sys.exit(1)
+            except UserDeactivated as e:
+                LOGS.info(f"Error {e}")
+                sys.exit(1)
+            except AuthKeyDuplicated as e:
+                LOGS.info(f"Error {e}")
+                sys.exit(1)
             except Exception as e:
-                LOGS.error(f"Error starting userbot: {e}")
+                LOGS.info(f"Error starting userbot: {e}")
+            ex = await cli.get_me()
+            LOGS.info(f"Started {ex.first_name}")
+            await cli.send_message("me", "Starting Akeno Userbot")
+            try:
+                await cli.join_chat("RendyProjects")
+            except UserIsBlocked:
+                return LOGS.info("You have been blocked. Please support @xtdevs")
         await idle()
     except Exception as e:
-        LOGS.error(f"Error in main: {e}")
+        LOGS.info(f"Error in main: {e}")
     finally:
-        await aiohttpsession.close()
-        tasks = asyncio.all_tasks()
-        for task in tasks:
+        await asyncio.gather(
+            aiohttpsession.close()
+        )
+
+        for task in asyncio.all_tasks():
             task.cancel()
-        await asyncio.gather(*tasks, return_exceptions=True)
         LOGS.info("All tasks completed successfully!")
 
 if __name__ == "__main__":
