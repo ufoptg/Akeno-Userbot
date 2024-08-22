@@ -32,10 +32,33 @@ from Akeno import aiohttpsession, clients
 from Akeno.utils.database import db
 from Akeno.utils.logger import LOGS
 
+import dns.resolver
+import socket
+
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
 logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
 loop = asyncio.get_event_loop()
+
+def custom_resolver(hostname):
+    resolver = dns.resolver.Resolver()
+    resolver.nameservers = ["8.8.8.8", "8.8.4.4"]  # Using Google's DNS servers
+    answers = resolver.resolve(hostname, "A")
+    return answers[0].address
+
+
+original_getaddrinfo = socket.getaddrinfo
+
+
+def custom_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    try:
+        ip = custom_resolver(host)
+        return [(socket.AF_INET, socket.SOCK_STREAM, proto, "", (ip, port))]
+    except Exception as e:
+        return original_getaddrinfo(host, port, family, type, proto, flags)
+
+
+socket.getaddrinfo = custom_getaddrinfo
 
 async def main():
     try:
