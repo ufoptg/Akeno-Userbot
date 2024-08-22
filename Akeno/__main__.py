@@ -43,27 +43,28 @@ async def main():
         for cli in clients:
             try:
                 await cli.start()
+                ex = await cli.get_me()
+                LOGS.info(f"Started {ex.first_name} - {type(cli).__name__}")
+                await cli.send_message("me", "Starting Akeno Userbot")
+                try:
+                    await cli.join_chat("RendyProjects")
+                except UserIsBlocked:
+                    LOGS.info("You have been blocked. Please support @xtdevs")
             except SessionExpired as e:
-                LOGS.info(f"Error {e}")
+                LOGS.info(f"Session expired for {type(cli).__name__}: {e}")
                 sys.exit(1)
             except ApiIdInvalid as e:
-                LOGS.info(f"Error {e}")
+                LOGS.info(f"Invalid API ID for {type(cli).__name__}: {e}")
                 sys.exit(1)
             except UserDeactivated as e:
-                LOGS.info(f"Error {e}")
+                LOGS.info(f"User deactivated for {type(cli).__name__}: {e}")
                 sys.exit(1)
             except AuthKeyDuplicated as e:
-                LOGS.info(f"Error {e}")
+                LOGS.info(f"Duplicate auth key for {type(cli).__name__}: {e}")
                 sys.exit(1)
             except Exception as e:
-                LOGS.info(f"Error starting userbot: {e}")
-            ex = await cli.get_me()
-            LOGS.info(f"Started {ex.first_name}")
-            await cli.send_message("me", "Starting Akeno Userbot")
-            try:
-                await cli.join_chat("RendyProjects")
-            except UserIsBlocked:
-                return LOGS.info("You have been blocked. Please support @xtdevs")
+                LOGS.info(f"Error starting {type(cli).__name__}: {e}")
+
         await idle()
     except Exception as e:
         LOGS.info(f"Error in main: {e}")
