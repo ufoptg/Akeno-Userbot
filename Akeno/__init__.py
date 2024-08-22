@@ -45,7 +45,6 @@ SUDOERS = filters.user()
 aiohttpsession = ClientSession()
 
 __version__ = {
-# Pyrogram Client
     "pyrogram": pyrogram_version,
     "python": python_version(),
     "telethon": telethon_version,
@@ -68,6 +67,7 @@ if not hasattr(client, "group_call"):
 clients.append(client)
 
 # Telethon Client
+telethon_client = None
 try:
     if TELETHON_SESSION is not None:
         telethon_client = TelegramClient(
@@ -75,19 +75,26 @@ try:
             API_ID,
             API_HASH
         )
-    clients.append(telethon_client)
-except Exception:
-    logger.warning("No TELETHON_SESSION, Starting Pyrogram")
+        clients.append(telethon_client)
+    else:
+        logger.warning("TELETHON_SESSION is None. Skipping Telethon Client.")
+except Exception as e:
+    logger.warning(f"Error initializing Telethon Client: {e}")
 
 # Starting the clients
 async def start_clients():
-    try:
-        await client.start()
-        await telethon_client.start()
-        logger.info("Both clients have been started successfully.")
-    except Exception:
-        await client.start()
-        logger.info("Pyrogram Client started successfully.")
+    started_clients = []
+    for cli in clients:
+        try:
+            await cli.start()
+            started_clients.append(cli)
+            logger.info(f"{type(cli).__name__} Client started successfully.")
+        except Exception as e:
+            logger.warning(f"Error starting {type(cli).__name__} Client: {e}")
+    
+    if not started_clients:
+        logger.error("No clients started successfully.")
+        sys.exit(1)
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(start_clients())
