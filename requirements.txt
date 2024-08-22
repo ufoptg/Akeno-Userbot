@@ -1,5 +1,6 @@
 git+https://github.com/KurimuzonAkuma/pyrogram.git
 git+https://github.com/ufoptg/Telethon.git
+dnspython
 aiofiles
 aiohttp
 future
