@@ -68,18 +68,26 @@ if not hasattr(client, "group_call"):
 clients.append(client)
 
 # Telethon Client
-telethon_client = TelegramClient(
-    TELETHON_SESSION,  # You need to specify this in your config file
-    API_ID,
-    API_HASH
-)
-clients.append(telethon_client)
+try:
+    if TELETHON_SESSION is not None:
+        telethon_client = TelegramClient(
+            TELETHON_SESSION,
+            API_ID,
+            API_HASH
+        )
+    clients.append(telethon_client)
+except Exception:
+    logger.warning("No TELETHON_SESSION, Starting Pyrogram")
 
 # Starting the clients
 async def start_clients():
-    await client.start()
-    await telethon_client.start()
-    logger.info("Both clients have been started successfully.")
+    try:
+        await client.start()
+        await telethon_client.start()
+        logger.info("Both clients have been started successfully.")
+    except Exception:
+        await client.start()
+        logger.info("Pyrogram Client started successfully.")
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(start_clients())
